@@ -1,0 +1,32 @@
+// AES加密
+// data是需要被加密的原始数据，key是注册表中的值
+QString Hipi::encryptAES(const QString &amp;data, QString key)
+{
+ QAESEncryption encryption(QAESEncryption::AES_128, QAESEncryption::ECB, QAESEncryption::ZERO);
+ QByteArray hashKey = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Md5);
+ QByteArray encodedText = encryption.encode(data.toUtf8(), hashKey);
+ QString str_encode_text = QString::fromLatin1(encodedText.toBase64());
+ //qDebug() &lt;&lt; "str_encode_text.size():" &lt;&lt; str_encode_text.size();
+ return str_encode_text;
+
+}
+// AES解密
+//data是需要被解密的原始数据，key是注册表中的值
+QString Hipi::decryptAES(const QString &amp;data, QString key)
+{
+ QAESEncryption encryption(QAESEncryption::AES_128, QAESEncryption::ECB, QAESEncryption::ZERO);
+ QByteArray hashKey2 = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Md5);
+ QByteArray decodedText = encryption.decode(QByteArray::fromBase64(data.toLatin1()), hashKey2);
+ //移除填充
+ qDebug() &lt;&lt; "decodedText : " &lt;&lt; QAESEncryption::RemovePadding(decodedText, QAESEncryption::PKCS7);
+
+ return decodedText;
+}
+int main()
+{
+ std::string data = "FEBFBFF000306C3@@@M701GQFQ";
+    
+ std::string key = "alex&amp;ritzy";
+ QString cipher = encryptAES(data, key);
+ return 0;
+}
